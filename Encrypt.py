@@ -1,3 +1,4 @@
+import sys
 def text_to_64bit_blocks(plaintext):
     '''convert plaintext to 64-bit blocks'''
     def text_to_binary(text):
@@ -19,6 +20,28 @@ def text_to_64bit_blocks(plaintext):
     padded_binary_string = pad_binary_string(binary_string)
     blocks = split_into_blocks(padded_binary_string)
     return blocks
+
+def text_to_64bit_key(plaintext):
+    '''convert plaintext to 64-bit blocks'''
+    def text_to_binary(text):
+        '''convert plaintext to binary string'''
+        binary_string = ''.join(format(ord(char), '08b') for char in text)
+        if len(binary_string) > 64:
+            raise ValueError("Key too long!")
+        return binary_string
+    def pad_binary_string(binary_string):
+        '''pad binary string to multiple of 64 bits'''
+        padding_length = 64 - (len(binary_string) % 64)
+        if padding_length != 64:
+            binary_string = binary_string + '0' * padding_length
+        return binary_string
+    try:
+        binary_string = text_to_binary(plaintext)
+    except ValueError as e:
+        print(e)
+        return None
+    padded_binary_string = pad_binary_string(binary_string)
+    return padded_binary_string
 
 
 def blocks_to_text(blocks):
@@ -51,6 +74,11 @@ def initial_permutation(block):
 
 if __name__ == '__main__':
     plaintext = "This is a test!"
+    key = "mykey"
+    binary_key = text_to_64bit_key(key)
+    if binary_key == None:
+        sys.exit(1)
+    print(f"binary key: {binary_key}")
     blocks = text_to_64bit_blocks(plaintext)
     for i , block in enumerate(blocks):
         print(f"block {i+1}: {block}")
@@ -59,4 +87,3 @@ if __name__ == '__main__':
     print(blocks_to_text(blocks))
     
     
-
